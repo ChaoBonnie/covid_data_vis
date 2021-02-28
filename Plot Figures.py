@@ -7,12 +7,14 @@ from scipy import stats
 import numpy as np
 import itertools
 
+
+### Set up multiple dataframes ###
+
+
 # Set up the primary dataframe #
 
 df_toronto = pd.read_excel(r'C:\Users\chaob\Documents\ETC Data.xlsx', sheet_name='Toronto')
 df_turin = pd.read_excel(r'C:\Users\chaob\Documents\ETC Data.xlsx', sheet_name='Turin')
-# df_toronto.rename(columns={"IL-6": "Log IL-6", "IL-8": "Log IL-8", "IL-10": "Log IL-10", "sTNFR1": "Log sTNFR1", "sTREM1": "Log sTREM1"})
-# df_turin.rename(columns={"IL-6": "Log IL-6", "IL-8": "Log IL-8", "IL-10": "Log IL-10", "sTNFR1": "Log sTNFR1", "sTREM1": "Log sTREM1"})
 df_toronto['Hospital Admission'] = df_toronto['Hospital Admission'].replace({'No': 'Discharged', 'Yes': 'Hospitalized', 'Yes (ICU)': 'Hospitalized'})
 df_turin['Hospital Admission'] = df_turin['Hospital Admission'].replace({'No': 'Discharged', 'Yes': 'Hospitalized'})
 df_toronto['Gender'] = df_toronto['Gender'].replace({'M': 'Male', 'F': 'Female'})
@@ -20,7 +22,6 @@ df_toronto['Age at Study Enrollment'] = pd.cut(df_toronto['Age at Study Enrollme
 df_toronto['BMI'] = pd.cut(df_toronto['BMI'], bins=[0, 29.9, 100], include_lowest=True, labels=['<30', '≥30'])
 print(df_toronto['Ethnicity'].value_counts()[:3])
 df_toronto_3ethnicities = df_toronto[df_toronto['Ethnicity'].isin(['White or Caucasian', 'Black or African American', 'South Asian'])]
-# df = pd.concat([df_toronto, df_turin])
 print(df_toronto_3ethnicities.shape)
 
 # Set up the secondary dataframe #
@@ -42,7 +43,6 @@ df_hosp = pd.read_excel(r'C:\Users\chaob\Documents\ETC Hospitalization-COVID Dat
 df_covid = pd.read_excel(r'C:\Users\chaob\Documents\ETC Hospitalization-COVID Data.xlsx', sheet_name='COVID-19')
 df_hosp = df_hosp.rename(columns={"Subject Required ICU Care": "Hospitalization", "Total Hospitalization (Days)_3groups": "Hospital Length of Stay (Days)_3groups"})
 df_hosp = df_hosp.rename(columns={"Subject Required ICU Care": "Hospitalization", "Total Hospitalization (Days)_2groups": "Hospital Length of Stay (Days)_2groups"})
-
 df_hosp['Hospitalization'][~df_hosp['Hospitalization'].isnull()] = 'ICU'
 df_hosp['Hospitalization'] = df_hosp['Hospitalization'].fillna('Ward')
 df_hosp['Hospital Length of Stay (Days)_3groups'] = df_hosp['Hospital Length of Stay (Days)_3groups'].replace({'>28': 28})
@@ -52,33 +52,38 @@ df_hosp['Hospital Length of Stay (Days)_2groups'] = pd.cut(df_hosp['Hospital Len
 df_hosp['28-Day Mortality'] = df_hosp['28-Day Mortality'].fillna('No')
 
 # Set up the updated COVID dataframe #
+
 df_covidV2= pd.read_excel(r'C:\Users\chaob\Documents\ETC Updated COVID Data.xlsx')
 df_covidV2['COVID-19 Pneumonia'] = df_covidV2['COVID-19 Pneumonia'].replace({'N': 'No', 'Y': 'Yes'})
 df_covidV2[['Bacteremia', 'ARDS', 'CAP', 'VAP']] = df_covidV2[['Bacteremia', 'ARDS', 'CAP', 'VAP']].replace({'N': 'No', 'Y': 'Yes'})
 
 # Set up the COVID-v3 dataframe #
+
 df_covidV3= pd.read_excel(r'C:\Users\chaob\Documents\ETC COVID Data v3.xlsx')
 df_covidV3['COVID-19 Pneumonia'] = df_covidV3['COVID-19 Pneumonia'].replace({'N': 'No', 'Y': 'Yes'})
 
 # Name subfigures and process NaN #
+
 subfigures = ['IL-6 (pg/mL)', 'IL-8 (pg/mL)', 'IL-10 (pg/mL)', 'sTNFR1 (pg/mL)', 'sTREM1 (pg/mL)']
 subfigures_log = [r'Log$_2$ IL-6 Concentration (pg/mL)', r'Log$_2$ IL-8 Concentration (pg/mL)', r'Log$_2$ IL-10 Concentration (pg/mL)',
                   r'Log$_2$ sTNFR1 Concentration (pg/mL)', r'Log$_2$ sTREM1 Concentration (pg/mL)']
 dataframes = [df_toronto, df_toronto_3ethnicities, df_turin, df_secondary, df_hosp, df_covidV2, df_covidV3]
-# categories = ['No, Toronto', 'Yes, Toronto', 'No, Turin', 'Yes, Turin']
 df_toronto.loc[:, subfigures] = df_toronto[subfigures].fillna(0)
 df_secondary.loc[:, subfigures] = df_secondary[subfigures].fillna(0)
 df_hosp.loc[:, subfigures] = df_hosp[subfigures].fillna(0)
 df_covidV2.loc[:, subfigures] = df_covidV2[subfigures].fillna(0)
-
 # df_covid.loc[:, subfigures] = df_covid[subfigures].fillna(0)
+
+# Inspect the dataframes #
+
 # print(df_toronto.to_string())
 # print(df_secondary.to_string())
 # print(df_hosp.to_string())
 # # print(df_covid.to_string())
 # print(df_covidV2.to_string())
 
-# Set zero-values to 0.5*LOD #
+# Set zero-values to 0.5*LOD (lowest detection limit) of the quantification machine #
+
 for dataframe in dataframes:
     dataframe['IL-6 (pg/mL)'] = dataframe['IL-6 (pg/mL)'].replace({0: 11.5})
     dataframe['IL-8 (pg/mL)'] = dataframe['IL-8 (pg/mL)'].replace({0: 13.5})
@@ -86,7 +91,8 @@ for dataframe in dataframes:
     dataframe['sTNFR1 (pg/mL)'] = dataframe['sTNFR1 (pg/mL)'].replace({0: 8.5})
     dataframe['sTREM1 (pg/mL)'] = dataframe['sTREM1 (pg/mL)'].replace({0: 22})
 
-# Check values #
+
+### Check values ###
 
 def check_values (df, x, x1, x2):
 
@@ -111,6 +117,12 @@ def check_values (df, x, x1, x2):
 # check_values(df_covidV2, 'ARDS', 'No', 'Yes')
 # check_values(df_covidV2, 'CAP', 'No', 'Yes')
 
+
+### Visualize data ###
+
+
+# Annotate significance level using pre-determined significance values imported from an Excel sheet #
+
 def annotate_anova(ax, data, y, anova_path, anova_sheet):
     df = pd.read_excel(anova_path, sheet_name=anova_sheet, index_col=0)
     df = df[y.split(' ')[0]]
@@ -125,16 +137,7 @@ def annotate_anova(ax, data, y, anova_path, anova_sheet):
                         box_pairs=box_pairs, pvalues=pvalues, perform_stat_test=False,
                         loc='outside', verbose=0)
 
-
-def horizontal_lines(data, ax, x, y, **kwargs):
-    data = data.copy()
-    xticks = ax.get_xticklabels()
-    xticks = {tick.get_text(): i for i, tick in enumerate(xticks)}
-    data['xmin'] = data[x].apply(lambda xval: xticks[str(xval)] - 0.4)
-    data['xmax'] = data[x].apply(lambda xval: xticks[str(xval)] + 0.4)
-    ax.hlines(y=data[y], xmin=data['xmin'], xmax=data['xmax'], **kwargs)
-    return ax
-
+# Plot two types of graphs (box + strip or point + strip) with significance annotations #
 
 def make_graph(df, x, order, figname, figsize=None, box=True, show_xaxis=True, rotate_xaxis=False, anova_path=None, anova_sheet=None, show_fig=False):
 
@@ -193,8 +196,6 @@ def make_graph(df, x, order, figname, figsize=None, box=True, show_xaxis=True, r
             elif p < 0.05:
                 ax.title.set_text('*')
 
-        # ax.set_yscale('symlog', base=2)
-
         if show_xaxis == False:
             ax.set_xlabel('')
 
@@ -205,6 +206,8 @@ def make_graph(df, x, order, figname, figsize=None, box=True, show_xaxis=True, r
     else:
         fig.savefig(figname, dpi=200)
         plt.close()
+
+# Call graph functions #
 
 # make_graph(df_toronto, 'Hospital Admission', ['Discharged', 'Hospitalized'], 'Fig1_Toronto', show_xaxis=False)
 # make_graph(df_turin, 'Hospital Admission', ['Discharged', 'Hospitalized'], 'Fig1_Turin', show_xaxis=False)
@@ -251,5 +254,3 @@ make_graph(df_toronto_3ethnicities, 'Ethnicity', ['White or Caucasian', 'Black o
 # make_graph(df_hosp, 'Hospital Length of Stay (Days)', ['≤3', '4-7', '>7'], 'Fig4_LOS_95CI', box=False)
 # make_graph(df_hosp, '28-Day Mortality', ['No', 'Yes'], 'Fig4_Mortality_95CI', box=False)
 # make_graph(df_covid, 'COVID-19 Severity', ['Mild', 'Moderate', 'Severe'], 'Fig4_COVID-19 Severity_95CI', box=False)
-
-
