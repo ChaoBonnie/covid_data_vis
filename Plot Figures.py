@@ -151,14 +151,6 @@ def make_graph(df, x, order, figname, figsize=None, box=True, show_xaxis=True, r
     for ax, y, log in zip(axs, subfigures, subfigures_log):
         df.loc[:, log] = np.log2(df[y])
         ax.set_ylim(top=max(df[log]) * 1.2)
-        # cytokine_med_no = np.median(df[y][df[x] == order[0]])
-        # cytokine_25_no = np.percentile(df[y][df[x] == order[0]], 25)
-        # cytokine_75_no = np.percentile(df[y][df[x] == order[0]], 75)
-        # cytokine_med_yes = np.median(df[y][df[x] == order[1]])
-        # cytokine_25_yes = np.percentile(df[y][df[x] == order[1]], 25)
-        # cytokine_75_yes = np.percentile(df[y][df[x] == order[1]], 75)
-        # print(y, '\n', cytokine_med_no, cytokine_25_no, cytokine_75_no, '\n', cytokine_med_yes, cytokine_25_yes,
-        #       cytokine_75_yes)
         if box == True:
             sns.boxplot(x=x, y=log, data=df, ax=ax, order=order, width=0.4, showfliers=False, saturation=0.6, palette='pastel')
             sns.stripplot(x=x, y=log, data=df, ax=ax, order=order, alpha=0.7)
