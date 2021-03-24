@@ -26,7 +26,7 @@ print(df_toronto_3ethnicities.shape)
 
 # Set up the secondary dataframe #
 
-df_secondary = pd.read_excel(r'C:\Users\chaob\Documents\ETC Data v2.xlsx')
+df_secondary = pd.read_excel(r'C:\Users\chaob\Documents\ETC Data (Additional Info).xlsx')
 df_secondary['Temperature at Presentation (°C)'] = \
     df_secondary['Temperature at Presentation (°C)'].replace({'-': None})
 df_secondary['Temperature at Presentation (°C)'] = pd.cut(df_secondary['Temperature at Presentation (°C)'], bins=[0, 37.9, 100], labels=['<38', '≥38'])
@@ -210,7 +210,7 @@ def make_graph(df, x, order, figname, figsize=None, box=True, show_xaxis=True, r
 # Call graph functions #
 
 # make_graph(df_toronto, 'Hospital Admission', ['Discharged', 'Hospitalized'], 'Fig1_Toronto', show_xaxis=False)
-# make_graph(df_turin, 'Hospital Admission', ['Discharged', 'Hospitalized'], 'Fig1_Turin', show_xaxis=False)
+make_graph(df_turin, 'Hospital Admission', ['Discharged', 'Hospitalized'], 'Fig1_Turin', show_xaxis=False)
 # # # make_graph(df_toronto, 'COVID-19+', ['Negative', 'Positive'], 'Fig2_COVID-19')
 # make_graph(df_toronto, 'Gender', ['Male', 'Female'], 'Fig2_Gender')
 # make_graph(df_toronto, 'Age at Study Enrollment', ['<50', '50-70', '>70'], 'Fig2_Age')
@@ -234,8 +234,8 @@ make_graph(df_toronto_3ethnicities, 'Ethnicity', ['White or Caucasian', 'Black o
 # make_graph(df_covidV2, 'ARDS', ['No', 'Yes'], 'Fig_COVID-19 ARDS')
 # make_graph(df_covidV2, 'CAP', ['No', 'Yes'], 'Fig_COVID-19 CAP')
 # make_graph(df_covidV2, 'VAP', ['No', 'Yes'], 'Fig_COVID-19 VAP')
-# make_graph(df_covidV3, 'COVID-19 Severity', ['Mild', 'Moderate', 'Severe'], 'Fig_COVID-19 Severity')
-# make_graph(df_covidV3, 'COVID-19 Pneumonia', ['No', 'Yes'], 'Fig_COVID-19 Pneumonia')
+make_graph(df_covidV3, 'COVID-19 Severity', ['Mild', 'Moderate', 'Severe'], 'Fig_COVID-19 Severity')
+make_graph(df_covidV3, 'COVID-19 Pneumonia', ['No', 'Yes'], 'Fig_COVID-19 Pneumonia')
 
 
 # make_graph(df_toronto, 'Hospital Admission', ['Discharged', 'Hospitalized'], 'Fig1_Toronto_95CI', box=False, show_xaxis=False)
